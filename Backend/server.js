@@ -20,7 +20,7 @@ function OTPGenerator() {
 
 app.use(cors(
   {
-    origin: 'http://localhost:5173',  // your frontend origin
+    origin: 'https://snip-vault-frontend.onrender.com',  // your frontend origin
     credentials: true
   }
 ))
