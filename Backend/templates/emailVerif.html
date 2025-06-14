@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snip-Vault Email Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f9fb;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 30px 40px;
+    }
+    h2 {
+      color: #222;
+      margin-top: 0;
+    }
+    p {
+      color: #555;
+      font-size: 16px;
+    }
+    .otp {
+      margin: 30px 0;
+      text-align: center;
+    }
+    .otp-code {
+      display: inline-block;
+      font-size: 24px;
+      letter-spacing: 5px;
+      padding: 12px 24px;
+      background-color: #efefef;
+      border-radius: 6px;
+      color: #333;
+    }
+    .footer {
+      color: #999;
+      font-size: 14px;
+      margin-top: 40px;
+    }
+    .footer a {
+      color: #666;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Verify your email address</h2>
+    <p>Hi <strong>{{username}}</strong>,</p>
+    <p>
+      Thank you for signing up for <strong>Snip-Vault</strong> — your secure snippet manager.
+      To complete your registration, please use the verification code below:
+    </p>
+
+    <div class="otp">
+      <span class="otp-code">{{OTP_CODE}}</span>
+    </div>
+
+    <p>
+      This code is valid for the next 2 minutes. If you didn’t request this, please ignore this email.
+    </p>
+
+    <p class="footer">
+      — The Snip-Vault Team<br />
+      <!-- <a href="https://snip-vault.app">https://snip-vault.app</a> -->
+    </p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+.imp {
+    background: linear-gradient(270deg, #f5db36, #f67a27, #f63253, #44e3ee);
+    background-size: 400% 400%;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    animation: gradientShift 4s ease-in infinite;
+}

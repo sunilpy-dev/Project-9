@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Snip-Vault</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f9fb;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 30px 40px;
+    }
+    h2 {
+      color: #222;
+      margin-top: 0;
+    }
+    p {
+      color: #555;
+      font-size: 16px;
+    }
+    .cta {
+      margin: 30px 0;
+      text-align: center;
+    }
+    .login-button {
+      background-color: #4a90e2;
+      color: #fff;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 16px;
+      display: inline-block;
+    }
+    .footer {
+      color: #999;
+      font-size: 14px;
+      margin-top: 40px;
+    }
+    .footer a {
+      color: #666;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Welcome to Snip-Vault 🎉</h2>
+    <p>Hi <strong>{{username}}</strong>,</p>
+    <p>
+      Your registration is now complete! You’re all set to start using <strong>Snip-Vault</strong> —
+      your secure and intelligent snippet manager.
+    </p>
+
+    <div class="cta">
+      <a href="http://localhost:5173/login" class="login-button">Log In to Your Account</a>
+    </div>
+
+    <p>If you did not create this account, you can safely ignore this email.</p>
+
+    <p class="footer">
+      — The Snip-Vault Team<br />
+    </p>
+  </div>
+</body>
+</html>
