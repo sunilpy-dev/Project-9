@@ -14,6 +14,7 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 const port = process.env.PORT || 3000
+const secret=process.env.JWT_SECRET
 function OTPGenerator() {
   return 10000 + Math.floor(Math.random() * 90000);
 }
@@ -100,7 +101,7 @@ app.post('/saveRegister', async (req, res) => {
       const collection = db.collection('Register_details');
       const result = await collection.insertOne({ username: username, email: email, password: hash, id: id, verificationCode: verificationCode })
       sendEmail(username, email, verificationCode)
-      let token = jwt.sign({ email: email, password: password }, 'shhhhhhhhh', { expiresIn: '10m' })
+      let token = jwt.sign({ email: email, password: password }, JWT_SECRET, { expiresIn: '10m' })
       res.cookie('token', token
         , {
           httpOnly: true,
@@ -126,7 +127,7 @@ app.post('/checkUser', async (req, res) => {
     // console.log({pass1:result.password,pass2:data.password})
     bcrypt.compare(data.password, result.password, function (err, isMatch) {
       if (isMatch) {
-        let token = jwt.sign({ email: data.email, password: data.password }, 'shhhhhhhhh', { expiresIn: '10m' })
+        let token = jwt.sign({ email: data.email, password: data.password }, JWT_SECRET, { expiresIn: '10m' })
         res.cookie('token', token
           , {
             httpOnly: true,
@@ -205,7 +206,7 @@ function isLoggedIn(req, res, next) {
   if (!req.cookies.token) {
     return res.status(401).json({ message: "Please login!" });
   } else {
-    let data = jwt.verify(req.cookies.token, 'shhhhhhhhh');
+    let data = jwt.verify(req.cookies.token, JWT_SECRET);
     req.user = data;
     next();
   }
