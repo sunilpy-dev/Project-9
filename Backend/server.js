@@ -1,6 +1,5 @@
 const express = require('express')
 const app = express()
-const port = 3000
 const cors = require('cors')
 const dotenv = require('dotenv')
 const fs = require('fs');
@@ -14,6 +13,7 @@ const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
+const port = process.env.PORT || 3000
 function OTPGenerator() {
   return 10000 + Math.floor(Math.random() * 90000);
 }
