@@ -32,7 +32,7 @@ const Navbar = () => {
   }
   const handleCloseLogOut = async () => {
     sethamBurger(false)
-    let res = await fetch('http://localhost:3000/logot',{ method: "GET" ,credentials: "include" });
+    let res = await fetch('https://snip-vault-backend.vercel.app/logot',{ method: "GET" ,credentials: "include" });
     value.setloggedIn(false)
     value.setemail("")
     let success = await res.text()

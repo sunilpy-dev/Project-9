@@ -40,7 +40,7 @@ function Home() {
     const blurHappend = useRef()
     async function fetchData() {
         // console.log(regx)
-        let req = await fetch('http://localhost:3000/fetchdata', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
+        let req = await fetch('https://snip-vault-backend.vercel.app/fetchdata', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
         let data1 = await req.json()
         if (req.ok) {
             setdetails(data1.Result) // so here it is not adding the data1 arrya into details array but setting data1 array to the details array
@@ -72,7 +72,7 @@ function Home() {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const res = await fetch('http://localhost:3000/verifyUser', {
+            const res = await fetch('https://snip-vault-backend.vercel.app/verifyUser', {
                 method: 'GET',
                 credentials: 'include'
             });
@@ -100,7 +100,7 @@ function Home() {
             setTimeout(() => {
                 setclick(false)
             }, 2000);
-            let res = await fetch('http://localhost:3000/', { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, id: uuidv4() + '-' + value.email.split('@')[0] }) })
+            let res = await fetch('https://snip-vault-backend.vercel.app/', { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, id: uuidv4() + '-' + value.email.split('@')[0] }) })
             let recived = await res.json()
             if (res.ok) {
                 setsuccess(true)
@@ -199,7 +199,7 @@ function Home() {
     }
     const handleEdit = async (id) => {
         setdetails(details.filter(item => item.id !== id))
-        let res = await fetch('http://localhost:3000/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+        let res = await fetch('https://snip-vault-backend.vercel.app/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
         let result = await res.text()
         if (res.ok) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -232,7 +232,7 @@ function Home() {
     const handleDelet = async (id) => {
         let cnf = confirm("Do you really want to delete this code data?")
         if (cnf) {
-            let del = await fetch('http://localhost:3000/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+            let del = await fetch('https://snip-vault-backend.vercel.app/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
             let result = del.text()
             if (del.ok) {
 
@@ -279,7 +279,7 @@ function Home() {
     }
     const handleExpand = async (id) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        // let res = await fetch('http://localhost:3000/findone', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+        // let res = await fetch('https://snip-vault-backend.vercel.app/findone', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
         // setcodeDetails(dataFound)
         // let dataFound = await res.json()
         // if (dataFound?.Result) {
