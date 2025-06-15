@@ -21,7 +21,7 @@ function OTPGenerator() {
 
 app.use(cors(
   {
-    origin: '*',  // your frontend origin
+    origin:"*",  // your frontend origin
     credentials: true
   }
 ))
