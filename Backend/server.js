@@ -20,7 +20,6 @@ function OTPGenerator() {
 }
 
 const allowedOrigins = [
-  'http://localhost:5173',
   'https://snip-vault-frontend.onrender.com'
 ];
 app.use(cors({
