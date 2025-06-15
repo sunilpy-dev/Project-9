@@ -62,7 +62,7 @@ app.get('/logot', async (req, res) => {
       {
         httpOnly: true,
         secure: true,
-        sameSite: "Strict"
+        sameSite: "Lax"
       }
     );
     res.send(true)
@@ -154,7 +154,7 @@ app.post('/saveRegister', async (req, res) => {
           , {
             httpOnly: true,
             secure: true,
-            sameSite: 'Strict', // or 'Lax'
+            sameSite: 'Lax', // or 'Lax'
             maxAge: 10 * 60 * 1000, // 10 minutes
           }
         )
@@ -186,7 +186,7 @@ app.post('/checkUser', async (req, res) => {
             , {
               httpOnly: true,
               secure: true,
-              sameSite: 'Strict', // or 'Lax'
+              sameSite: 'Lax', // or 'Lax'
               maxAge: 10 * 60 * 1000, // 10 minutes
             }
           )
