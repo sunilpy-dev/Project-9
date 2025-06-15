@@ -40,7 +40,7 @@ function Home() {
     const blurHappend = useRef()
     async function fetchData() {
         // console.log(regx)
-        let req = await fetch('https://snip-vault-backend.onrender.com/fetchdata', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
+        let req = await fetch('https://snip-vault-backend.onrender.com/fetchdata', { method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
         let data1 = await req.json()
         if (req.ok) {
             setdetails(data1.Result) // so here it is not adding the data1 arrya into details array but setting data1 array to the details array
@@ -199,7 +199,7 @@ function Home() {
     }
     const handleEdit = async (id) => {
         setdetails(details.filter(item => item.id !== id))
-        let res = await fetch('https://snip-vault-backend.onrender.com/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+        let res = await fetch('https://snip-vault-backend.onrender.com/', { method: "DELETE",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
         let result = await res.text()
         if (res.ok) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -232,7 +232,7 @@ function Home() {
     const handleDelet = async (id) => {
         let cnf = confirm("Do you really want to delete this code data?")
         if (cnf) {
-            let del = await fetch('https://snip-vault-backend.onrender.com/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+            let del = await fetch('https://snip-vault-backend.onrender.com/', { method: "DELETE",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
             let result = del.text()
             if (del.ok) {
 

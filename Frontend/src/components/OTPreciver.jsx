@@ -93,11 +93,11 @@ const OTPreciver = () => {
             });
         }
         else {
-            let res = await fetch('https://snip-vault-backend.onrender.com/verifyOTP', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: value.tempemail, verificationCode: finalOtp }) })
+            let res = await fetch('https://snip-vault-backend.onrender.com/verifyOTP', { method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: value.tempemail, verificationCode: finalOtp }) })
             let respond = await res.json()
             if (res.ok) {
                 await fetch('https://snip-vault-backend.onrender.com/sendConfirm', {
-                    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail })
+                    method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail })
                 })
 
                 navigate('/login', { replace: true })
@@ -136,7 +136,7 @@ const OTPreciver = () => {
     const handleResend = async () => {
         setresendClicked(true)
         let res = await fetch('https://snip-vault-backend.onrender.com/resetOTP', {
-            method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail, verificationCode: OTPGenerator() })
+            method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail, verificationCode: OTPGenerator() })
         })
         if (res.ok) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
