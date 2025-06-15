@@ -30,6 +30,8 @@ app.use(bodyParser.json())
 app.use(cookieParser());
 
 const dbName = 'Snip_Vault';
+
+app.options('*', cors());
 app.get('/', async (req, res) => {
   res.send('Hello world');
 })
