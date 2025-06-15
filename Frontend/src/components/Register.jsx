@@ -26,7 +26,7 @@ const Register = () => {
         setregisterForm({ ...registerForm, [e.target.name]: e.target.value })
     }
     const handleSubmit = async () => {
-        let found = await fetch('https://snip-vault-backend.onrender.com/finduser', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...registerForm }) })
+        let found = await fetch('https://snip-vault-backend.onrender.com/finduser', { method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...registerForm }) })
         // let emlrs = await fetch('http://localhost:3000/findemail', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email }) })
         let datafound = await found.text()
         // console.log(datafound)
