@@ -19,30 +19,14 @@ function OTPGenerator() {
   return 10000 + Math.floor(Math.random() * 90000);
 }
 
-const allowedOrigins = [
-  'https://snip-vault-ten.vercel.app'
-];
 
-// app.use(cors(
-//   {
-//     origin:"https://snip-vault-ten.vercel.app/",  // your frontend origin
-//     credentials: true
-//   }
-// ))
+app.use(cors(
+  {
+    origin: 'http://localhost:5173',  // your frontend origin
+    credentials: true
+  }
+))
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
-
-app.options('*', cors());
 app.use(express.json({ limit: '1mb' }));
 app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: true }));

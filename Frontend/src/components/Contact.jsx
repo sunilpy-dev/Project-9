@@ -15,7 +15,7 @@ const Contact = () => {
     if (messageDetails.message.length > 0 && messageDetails.name.length > 0 && messageDetails.email.length > 0 && messageDetails.email.endsWith('@gmail.com')) {
       if (messageDetails.message.length > 20) {
 
-        let res = await fetch('https://snip-vault-backend.vercel.app/sendMessage', { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...messageDetails, id: uuidv4() }) })
+        let res = await fetch('http://localhost:3000/sendMessage', { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...messageDetails, id: uuidv4() }) })
         let data = await res.json()
         if (res.ok) {
           setmessageDetails({ name: "", email: "", message: "", })  //used to reset the value setted by the user
