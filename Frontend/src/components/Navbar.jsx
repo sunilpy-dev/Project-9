@@ -70,17 +70,17 @@ const Navbar = () => {
   //   setuserData(false)
   // }
 
-  // useEffect(() => {
-  //   if (hamBurger) {
-  //     document.body.classList.add('overflow-hidden', 'touch-none'); // Add Tailwind class manually
-  //   } else {
-  //     document.body.classList.remove('overflow-hidden'); // Restore scroll
-  //   }
+  useEffect(() => {
+    if (hamBurger) {
+      document.body.classList.add('overflow-hidden'); // Add Tailwind class manually
+    } else {
+      document.body.classList.remove('overflow-hidden'); // Restore scroll
+    }
 
-  //   return () => {
-  //     document.body.classList.remove('overflow-hidden');
-  //   };
-  // }, [hamBurger]);
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, [hamBurger]);
 
   return (
     <>
