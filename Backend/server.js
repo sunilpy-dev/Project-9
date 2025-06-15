@@ -61,7 +61,7 @@ app.get('/logot', async (req, res) => {
       {
         httpOnly: true,
         secure: true,
-        sameSite: "Lax"
+        sameSite: "None"
       }
     );
     res.send(true)
@@ -148,12 +148,12 @@ app.post('/saveRegister', async (req, res) => {
         const collection = db.collection('Register_details');
         const result = await collection.insertOne({ username: username, email: email, password: hash, id: id, verificationCode: verificationCode })
         sendEmail(username, email, verificationCode)
-        let token = jwt.sign({ email: email, password: password }, secret, { expiresIn: '10m' })
+        let token = jwt.sign({ email: email }, secret, { expiresIn: '10m' })
         res.cookie('token', token
           , {
             httpOnly: true,
             secure: true,
-            sameSite: 'Lax', // or 'Lax'
+            sameSite: 'None', // or 'Lax'
             maxAge: 10 * 60 * 1000, // 10 minutes
           }
         )
@@ -180,12 +180,12 @@ app.post('/checkUser', async (req, res) => {
       // console.log({pass1:result.password,pass2:data.password})
       bcrypt.compare(data.password, result.password, function (err, isMatch) {
         if (isMatch) {
-          let token = jwt.sign({ email: data.email, password: data.password }, secret, { expiresIn: '10m' })
+          let token = jwt.sign({ email: data.email}, secret, { expiresIn: '10m' })
           res.cookie('token', token
             , {
               httpOnly: true,
               secure: true,
-              sameSite: 'Lax', // or 'Lax'
+              sameSite: 'None', // or 'Lax'
               maxAge: 10 * 60 * 1000, // 10 minutes
             }
           )
