@@ -30,6 +30,9 @@ app.use(bodyParser.json())
 app.use(cookieParser());
 
 const dbName = 'Snip_Vault';
+app.get('/', async (req, res) => {
+  res.send('Hello world');
+})
 // app.get('/', async (req, res) => {
 //   const db = client.db(dbName);
 //   const collection = db.collection('Code_details');
