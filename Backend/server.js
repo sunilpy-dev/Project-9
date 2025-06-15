@@ -14,14 +14,14 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 const port = process.env.PORT || 3000
-const secret=process.env.JWT_SECRET
+const secret=process.env.JWT_SECRET;
 function OTPGenerator() {
   return 10000 + Math.floor(Math.random() * 90000);
 }
 
 app.use(cors(
   {
-    origin: 'https://snip-vault-frontend.onrender.com',  // your frontend origin
+    origin: 'http://localhost:5173',  // your frontend origin
     credentials: true
   }
 ))
@@ -37,97 +37,99 @@ const dbName = 'Snip_Vault';
 //   res.json(result)
 // })
 app.get('/logot', async (req, res) => {
-  res.clearCookie('token', 
-    {
-    httpOnly: true,
-    secure: true,
-    sameSite: "Strict"
+  try {
+    res.clearCookie('token',
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict"
+      }
+    );
+    res.send(true)
+  } catch (error) {
+    console.log(error)
   }
-);
-  res.send(true)
 })
 app.get('/verifyUser', isLoggedIn, async (req, res) => {
   res.json({ loggedIn: true, user: req.user });
 })
 app.post('/sendConfirm', async (req, res) => {
   const { username, email } = await req.body
-  sendConfirmation(username, email);
-  res.json({ loggedIn: true, user: req.user });
+  try {
+    sendConfirmation(username, email);
+    res.json({ loggedIn: true, user: req.user });
+    
+  } catch (error) {
+    res.status(500).json({Message:"Message not sent"});
+  }
 })
 
 app.post('/fetchdata', async (req, res) => {
-  const { regx } = req.body
-  const db = client.db(dbName);
-  const collection = db.collection('Code_details');
-  // console.log("using regex:", new RegExp(`${regx}$`))
-  const result = await collection.find({ "id": { $regex: new RegExp(`${(regx)}$`) } }).toArray();
-  // const result = await collection.find({"id":{$regex:/-mhbhagat9900$/}}).toArray();
-  res.json(result)
+  const { regx } = await req.body
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('Code_details');
+    // console.log("using regex:", new RegExp(`${regx}$`))
+    const result = await collection.find({ "id": { $regex: new RegExp(`${(regx)}$`) } }).toArray();
+    // const result = await collection.find({"id":{$regex:/-mhbhagat9900$/}}).toArray();
+    res.json({Result:result})
+  } catch (error) {
+    res.status(500).json({Message:"Data not found"});
+  }
 })
 
 app.post('/', isLoggedIn, async (req, res) => {
   const data = await req.body
-  await client.connect();
-  const db = client.db(dbName);
-  const collection = db.collection('Code_details');
-  const result = await collection.insertOne(data)
-  res.send({ Success: true, Result: result })
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('Code_details');
+    const result = await collection.insertOne(data)
+    res.send({ Success: true, Result: result })
+  } catch (error) {
+    res.status(500).send(error);
+  }
+
 })
 app.post('/sendMessage', isLoggedIn, async (req, res) => {
   const data = await req.body
-  await client.connect();
-  const db = client.db(dbName);
-  const collection = db.collection('Message_details');
-  const result = await collection.insertOne(data)
-  res.json({ Success: true, Result: result })
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('Message_details');
+    const result = await collection.insertOne(data)
+    res.json({ Success: true, Result: result })
+  } catch (error) {
+    res.status(500).send("Data not inserted");
+  }
 })
 app.post('/finduser', async (req, res) => {
   const data = await req.body
-  // await client.connect();
-  const db = client.db(dbName);
-  const collection = db.collection('Register_details');
-  const result = await collection.findOne({ email: data.email })
-  // console.log(result)
-  res.send(result == null) //if the results are sended in the formate of the json then recive that in the formate of json and if in text form like res.send recive it in frontend as the res.text()
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('Register_details');
+    const result = await collection.findOne({ email: data.email })
+    // console.log(result)
+    res.send(result == null) //if the results are sended in the formate of the json then recive that in the formate of json and if in text form like res.send recive it in frontend as the res.text()
+  } catch (error) {
+    res.status(500).send(error);
+  }
 })
 app.post('/saveRegister', async (req, res) => {
-  // const data = await req.body
   let { username, email, password, id, verificationCode } = await req.body //we can use this also to fetch out frontend data
-  bcrypt.genSalt(10, (err, salt) => {
-    bcrypt.hash(password, salt, async (err, hash) => {
-      // console.log({ username: username, email: email, password: hash, id: id })
-      await client.connect();
-      const db = client.db(dbName);
-      const collection = db.collection('Register_details');
-      const result = await collection.insertOne({ username: username, email: email, password: hash, id: id, verificationCode: verificationCode })
-      sendEmail(username, email, verificationCode)
-      let token = jwt.sign({ email: email, password: password }, JWT_SECRET, { expiresIn: '10m' })
-      res.cookie('token', token
-        , {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'Strict', // or 'Lax'
-          maxAge: 10 * 60 * 1000, // 10 minutes
-        }
-      )
-      // console.log(token)
-      // res.send(true)
-      res.send({ Success: true, Result: result })
-    });
-  });
-})
-app.post('/checkUser', async (req, res) => {
-  const data = await req.body
-  // await client.connect();
-  const db = client.db(dbName);
-  const collection = db.collection('Register_details');
-  const result = await collection.findOne({ email: data.email })
-  // console.log(result)
-  if (result) {
-    // console.log({pass1:result.password,pass2:data.password})
-    bcrypt.compare(data.password, result.password, function (err, isMatch) {
-      if (isMatch) {
-        let token = jwt.sign({ email: data.email, password: data.password }, JWT_SECRET, { expiresIn: '10m' })
+  try {
+    // const data = await req.body
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(password, salt, async (err, hash) => {
+        // console.log({ username: username, email: email, password: hash, id: id })
+        await client.connect();
+        const db = client.db(dbName);
+        const collection = db.collection('Register_details');
+        const result = await collection.insertOne({ username: username, email: email, password: hash, id: id, verificationCode: verificationCode })
+        sendEmail(username, email, verificationCode)
+        let token = jwt.sign({ email: email, password: password }, secret, { expiresIn: '10m' })
         res.cookie('token', token
           , {
             httpOnly: true,
@@ -136,16 +138,51 @@ app.post('/checkUser', async (req, res) => {
             maxAge: 10 * 60 * 1000, // 10 minutes
           }
         )
-        return res.send(true);
-      }
-      if (err) {
-        res.status(500).send("Something went wrong!");
-      }
-      else { return res.send(false); }  //for sending the res to frontend in the through if else use the return here
-    })
+        // console.log(token)
+        // res.send(true)
+        res.send({ Success: true, Result: result })
+      });
+    });
+    
+  } catch (error) {
+    res.status(500).send(error);
   }
-  else {
-    return res.send(false);
+})
+app.post('/checkUser', async (req, res) => {
+  const data = await req.body
+  try {
+    
+    // await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('Register_details');
+    const result = await collection.findOne({ email: data.email })
+    // console.log(result)
+    if (result) {
+      // console.log({pass1:result.password,pass2:data.password})
+      bcrypt.compare(data.password, result.password, function (err, isMatch) {
+        if (isMatch) {
+          let token = jwt.sign({ email: data.email, password: data.password }, secret, { expiresIn: '10m' })
+          res.cookie('token', token
+            , {
+              httpOnly: true,
+              secure: true,
+              sameSite: 'Strict', // or 'Lax'
+              maxAge: 10 * 60 * 1000, // 10 minutes
+            }
+          )
+          return res.send(true);
+        }
+        if (err) {
+          res.status(500).send("Something went wrong!");
+        }
+        else { return res.send(false); }  //for sending the res to frontend in the through if else use the return here
+      })
+    }
+    else {
+      return res.send(false);
+    }
+  } catch (error) {
+    res.status(500).send(error);
   }
 })
 // app.post('/findemail', async (req, res) => {
@@ -165,9 +202,9 @@ app.post('/verifyOTP', async (req, res) => {
     const db = client.db(dbName);
     const collection = db.collection('Register_details');
     const result = await collection.findOne({ email: email, verificationCode: verificationCode })
-    res.send({ Success: true, Result: result })
+    res.json({ Success: true, Result: result })
   } catch (error) {
-    console.log(error)
+    res.status(500).json({message:error});
   }
 })
 app.post('/resetOTP', async (req, res) => {
@@ -178,12 +215,12 @@ app.post('/resetOTP', async (req, res) => {
     const collection = db.collection('Register_details');
     const result = await collection.updateOne({ email: email },
       [
-        { $set: { verificationCode: verificationCode } } 
+        { $set: { verificationCode: verificationCode } }
       ])
     sendEmail(username, email, verificationCode)
     res.send({ Success: true, Result: result })
   } catch (error) {
-    console.log(error)
+    res.status(500).send(error);
   }
 })
 
@@ -191,10 +228,14 @@ app.post('/resetOTP', async (req, res) => {
 
 app.delete('/', async (req, res) => {
   const id = req.body
-  const db = client.db(dbName);
-  const collection = db.collection('Code_details');
-  const result = await collection.deleteOne(id)
-  res.send({ Success: true, Result: result })
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('Code_details');
+    const result = await collection.deleteOne(id)
+    res.send({ Success: true, Result: result })
+  } catch (error) {
+    res.status(500).send(error);
+  }
 })
 
 app.listen(port, () => {
@@ -206,7 +247,7 @@ function isLoggedIn(req, res, next) {
   if (!req.cookies.token) {
     return res.status(401).json({ message: "Please login!" });
   } else {
-    let data = jwt.verify(req.cookies.token, JWT_SECRET);
+    let data = jwt.verify(req.cookies.token, secret);
     req.user = data;
     next();
   }
@@ -247,7 +288,7 @@ const sendEmail = async (username, email, verificationCode) => {
 
     // console.log("Message sent:", info.messageId);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 }
 const sendConfirmation = async (username, email) => {
@@ -268,6 +309,6 @@ const sendConfirmation = async (username, email) => {
 
     // console.log("Message sent:", info.messageId);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 }

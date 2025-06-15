@@ -16,8 +16,6 @@ import Contact from './components/Contact';
 import Login from './components/Login';
 import Register from './components/Register';
 import { loggedInContext } from './context/context';
-import Offline from './components/Offline';
-import NetworkMonitor from './components/NetworkMonitor';
 import OTPreciver from './components/OTPreciver';
 import Notfound from './components/Notfound';
 import ProtectOTP from './components/ProtectOTP';
@@ -68,12 +66,6 @@ function App() {
         <Footer /></>,
     },
     {
-      path: "/offline",
-      element: <>
-        <Offline />
-      </>,
-    },
-    {
       path: "/otp",
       element: <>
         <ProtectOTP>
@@ -103,7 +95,6 @@ function App() {
         theme="dark"
       />
       <loggedInContext.Provider value={{ loggedIn, setloggedIn, email, setemail, tempemail, settempemail, username, setusername, registerd, setregisterd }}>
-        <NetworkMonitor />
         <RouterProvider router={router} />
       </loggedInContext.Provider>
     </>

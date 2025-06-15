@@ -8,7 +8,7 @@ const OTPreciver = () => {
     const value = useContext(loggedInContext);
     const navigate = useNavigate();
     const [resendClicked, setresendClicked] = useState(false)
-    const [timeLeft, setTimeLeft] = useState(2*60); // 1 minutes in seconds
+    const [timeLeft, setTimeLeft] = useState(2 * 60); // 1 minutes in seconds
     const [isDisabled, setisDisabled] = useState(false)
 
     useEffect(() => {
@@ -25,7 +25,7 @@ const OTPreciver = () => {
         setTimeout(() => {
             setresendClicked(false)
             setisDisabled(true)
-        },  2*60* 1000);
+        }, 2 * 60 * 1000);
 
     }, [resendClicked]);
 
@@ -93,18 +93,31 @@ const OTPreciver = () => {
             });
         }
         else {
-            let res = await fetch('https://snip-vault-backend.onrender.com/verifyOTP', {
-                method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: value.tempemail, verificationCode: finalOtp })
-            })
+            let res = await fetch('http://localhost:3000/verifyOTP', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: value.tempemail, verificationCode: finalOtp }) })
+            let respond = await res.json()
             if (res.ok) {
-                await fetch('https://snip-vault-backend.onrender.com/sendConfirm', {
+                await fetch('http://localhost:3000/sendConfirm', {
                     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail })
                 })
-                
+
                 navigate('/login', { replace: true })
-            } else {
+            } else if (!res.ok) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 toast.error('Invalid OTP!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    delay: 0,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            }
+            else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                toast.error(`${respond.message}`, {
                     position: "top-right",
                     autoClose: 2000,
                     hideProgressBar: false,
@@ -122,7 +135,7 @@ const OTPreciver = () => {
 
     const handleResend = async () => {
         setresendClicked(true)
-        let res = await fetch('https://snip-vault-backend.onrender.com/resetOTP', {
+        let res = await fetch('http://localhost:3000/resetOTP', {
             method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail, verificationCode: OTPGenerator() })
         })
         if (res.ok) {
@@ -138,7 +151,7 @@ const OTPreciver = () => {
                 progress: undefined,
                 theme: "dark",
             });
-            setTimeLeft(2*60)
+            setTimeLeft(2 * 60)
         } else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             toast.error('Something went wrong!', {

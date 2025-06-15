@@ -32,6 +32,7 @@ function Home() {
     const [ShowMoredis, setShowMoredis] = useState(true)
     const [ShowLessdis, setShowLessdis] = useState(true)
     const [ShowAlldis, setShowAlldis] = useState(true)
+    const [resetdis, setresetdis] = useState(true)
     const [expand, setexpand] = useState(false)
     const [codeDetails, setcodeDetails] = useState({})
     const [end, setend] = useState(5)
@@ -39,9 +40,23 @@ function Home() {
     const blurHappend = useRef()
     async function fetchData() {
         // console.log(regx)
-        let req = await fetch('https://snip-vault-backend.onrender.com/fetchdata', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
+        let req = await fetch('http://localhost:3000/fetchdata', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
         let data1 = await req.json()
-        setdetails(data1) // so here it is not adding the data1 arrya into details array but setting data1 array to the details array
+        if (req.ok) {
+            setdetails(data1.Result) // so here it is not adding the data1 arrya into details array but setting data1 array to the details array
+        } else {
+            toast.error(`${data1.Message}`, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                delay: 2000,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
+        }
         // console.log(details)
 
     }
@@ -50,14 +65,14 @@ function Home() {
     }, [])
     useEffect(() => {
         fetchData()
-    }, [value.email,value.loggedIn])
+    }, [value.email, value.loggedIn])
 
-    
+
 
 
     useEffect(() => {
         const checkAuth = async () => {
-            const res = await fetch('https://snip-vault-backend.onrender.com/verifyUser', {
+            const res = await fetch('http://localhost:3000/verifyUser', {
                 method: 'GET',
                 credentials: 'include'
             });
@@ -85,7 +100,7 @@ function Home() {
             setTimeout(() => {
                 setclick(false)
             }, 2000);
-            let res = await fetch('https://snip-vault-backend.onrender.com/', { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, id: uuidv4() + '-' + value.email.split('@')[0] }) })
+            let res = await fetch('http://localhost:3000/', { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, id: uuidv4() + '-' + value.email.split('@')[0] }) })
             let recived = await res.json()
             if (res.ok) {
                 setsuccess(true)
@@ -184,28 +199,11 @@ function Home() {
     }
     const handleEdit = async (id) => {
         setdetails(details.filter(item => item.id !== id))
-        await fetch('https://snip-vault-backend.onrender.com/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        toast.success('Editing on', {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-        });
-        setdata({ ...details.filter(i => i.id == id)[0], id: id, time: date.toLocaleTimeString(), date: `${day}/${month}/${year}` })
-
-    }
-    const handleDelet = async (id) => {
-        let cnf = confirm("Do you really want to delete this code data?")
-        if (cnf) {
-            setdetails(details.filter(item => item.id !== id))
-            await fetch('https://snip-vault-backend.onrender.com/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+        let res = await fetch('http://localhost:3000/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+        let result = await res.text()
+        if (res.ok) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            toast.success('Code details deleted successfuly', {
+            toast.success('Editing on', {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -215,6 +213,54 @@ function Home() {
                 progress: undefined,
                 theme: "dark",
             });
+            setdata({ ...details.filter(i => i.id == id)[0], id: id, time: date.toLocaleTimeString(), date: `${day}/${month}/${year}` })
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            toast.success(`${result}`, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
+        }
+
+    }
+    const handleDelet = async (id) => {
+        let cnf = confirm("Do you really want to delete this code data?")
+        if (cnf) {
+            let del = await fetch('http://localhost:3000/', { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+            let result = del.text()
+            if (del.ok) {
+
+                setdetails(details.filter(item => item.id !== id))
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                toast.success('Code details deleted successfuly', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                toast.success(`${result}`, {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            }
         }
         else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -233,7 +279,7 @@ function Home() {
     }
     const handleExpand = async (id) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        // let res = await fetch('https://snip-vault-backend.onrender.com/findone', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+        // let res = await fetch('http://localhost:3000/findone', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
         // setcodeDetails(dataFound)
         // let dataFound = await res.json()
         // if (dataFound?.Result) {
@@ -261,27 +307,50 @@ function Home() {
         };
     }, [handleBlur]);
 
+
+    useEffect(() => {
+
+        if (details.length >= 8 && end < 6) {
+            setShowMoredis(false)
+        } else { setShowMoredis(true) }
+
+        if (details.length > 5 && end >= 8) {
+            setShowLessdis(false)
+        } else { setShowLessdis(true) }
+
+        if (end != details.length && details.length > 5) {
+            setShowAlldis(false)
+        } else { setShowAlldis(true) }
+
+        if (end != 5 && details.length >= 6) {
+            setresetdis(false)
+        } else { setresetdis(true) }
+
+    }, [end, details.length]);
     const handleShowMore = () => {
         // console.log('Show more')
-        if (details.length > 5 && end <= details.length + 3) {
-            setShowMoredis(false)
+        if (details.length > 5 && end <= 8) {
             setend(end + 3)
-        }
-        else { setShowMoredis(true) }
+        } else { setShowMoredis(true) }
+
     }
     const handleShowLess = () => {
         // console.log('Show Less')
-        if (defineElement.length > 5 && end >= defineElement.length + 3) {
-            setShowLessdis(false)
+        if (details.length > 5 && end >= 8) {
             setend(end - 3)
         } else { setShowLessdis(true) }
     }
     const handleShowAll = () => {
         // console.log('Show All')
         if (end != details.length && details.length > 5) {
-            setShowAlldis(false)
             setend(details.length)
         } else { setShowAlldis(true) }
+    }
+    const handleReset = () => {
+        // console.log('Show All')
+        if (end != 5 || details.length >= 6) {
+            setend(5)
+        } else { setShowMoredis(true) }
     }
 
 
@@ -400,9 +469,10 @@ function Home() {
                     </div>}
                 {details.length == 0 && <div className='text-sm sm:text-lg md:text-xl xl:text-2xl font-semibold text-gray-400 sm:p-5 w-[90%] m-1 md:m-2 text-center font-mono'><p>No code details to show</p></div>}
                 {details.length > 5 && <div className="buttons flex justify-center items-center w-full gap-3 sm:gap-6 mt-5">
-                    <button onClick={handleShowMore} className={`${ShowMoredis ? 'bg-gray-400' : 'buttonDetails'}  flex justify-center items-center bg-gray-100 text-black p-2 sm:p-2 text-[9px] sm:text-xs md:text-sm lg:text-lg rounded-lg font-semibold font-mono`}>Show More</button>
-                    <button onClick={handleShowLess} className={`${ShowLessdis ? 'bg-gray-400' : 'buttonDetails'}   flex justify-center items-center bg-gray-100 text-black p-2 sm:p-2 text-[9px] sm:text-xs md:text-sm lg:text-lg rounded-lg font-semibold font-mono`}>Show Less</button>
-                    <button onClick={handleShowAll} className={`${ShowAlldis ? 'bg-gray-400' : 'buttonDetails'} flex justify-center items-center bg-gray-100 text-black p-2 sm:p-2 text-[9px] sm:text-xs md:text-sm lg:text-lg rounded-lg font-semibold font-mono`}>Show All</button>
+                    <button onClick={handleShowMore} className={`${ShowMoredis ? 'bg-gray-400 cursor-not-allowed' : 'buttonDetails'}  flex justify-center items-center bg-gray-100 text-black p-2 sm:p-2 text-[9px] sm:text-xs md:text-sm lg:text-lg rounded-lg font-semibold font-mono`}>Show More</button>
+                    <button onClick={handleShowLess} className={`${ShowLessdis ? 'bg-gray-400 cursor-not-allowed' : 'buttonDetails'}   flex justify-center items-center bg-gray-100 text-black p-2 sm:p-2 text-[9px] sm:text-xs md:text-sm lg:text-lg rounded-lg font-semibold font-mono`}>Show Less</button>
+                    <button onClick={handleShowAll} className={`${ShowAlldis ? 'bg-gray-400 cursor-not-allowed' : 'buttonDetails'} flex justify-center items-center bg-gray-100 text-black p-2 sm:p-2 text-[9px] sm:text-xs md:text-sm lg:text-lg rounded-lg font-semibold font-mono`}>Show All</button>
+                    <button onClick={handleReset} className={`${resetdis ? 'bg-gray-400 cursor-not-allowed' : 'buttonDetails'} flex justify-center items-center bg-gray-100 text-black p-2 sm:p-2 text-[9px] sm:text-xs md:text-sm lg:text-lg rounded-lg font-semibold font-mono`}>Reset</button>
                 </div>}
                 {expand &&
                     <div className={`codetailsBox ${expand ? ' animate__animated animate__zoomIn' : ''} min-h-[350px] max-h-[450px] sm:min-h-[470px] sm:max-h-[500px] lg:min-h-[500px] lg:max-h-[600px] xl:min-h-[580px] xl:max-h-[680px] w-full absolute top-[200px] sm:top-56 md:top-48 lg:top-44 xl:top-48 2xl:top-40 flex justify-center items-center `}>
