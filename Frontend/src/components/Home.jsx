@@ -199,7 +199,7 @@ function Home() {
     }
     const handleEdit = async (id) => {
         setdetails(details.filter(item => item.id !== id))
-        let res = await fetch('https://snip-vault-backend.onrender.com/', { method: "DELETE",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+        let res = await fetch('https://snip-vault-backend.onrender.com/delete', { method: "DELETE",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
         let result = await res.text()
         if (res.ok) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -232,7 +232,7 @@ function Home() {
     const handleDelet = async (id) => {
         let cnf = confirm("Do you really want to delete this code data?")
         if (cnf) {
-            let del = await fetch('https://snip-vault-backend.onrender.com/', { method: "DELETE",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+            let del = await fetch('https://snip-vault-backend.onrender.com/delete', { method: "DELETE",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
             let result = del.text()
             if (del.ok) {
 

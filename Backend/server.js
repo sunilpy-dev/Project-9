@@ -246,7 +246,7 @@ app.post('/resetOTP', async (req, res) => {
 
 
 
-app.delete('/', async (req, res) => {
+app.delete('/delete', async (req, res) => {
   const id = req.body
   try {
     const db = client.db(dbName);
