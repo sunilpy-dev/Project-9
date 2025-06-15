@@ -21,7 +21,7 @@ function OTPGenerator() {
 
 app.use(cors(
   {
-    origin:"*",  // your frontend origin
+    origin:"https://snip-vault-ten.vercel.app/",  // your frontend origin
     credentials: true
   }
 ))
