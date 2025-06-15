@@ -15,7 +15,7 @@ const Login = () => {
     setloginForm({ ...loginForm, [e.target.name]: e.target.value })
   }
   const handleSubmission = async () => {
-    let res = await fetch('http://localhost:3000/checkUser', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...loginForm }), credentials: "include" })
+    let res = await fetch('https://snip-vault-backend.onrender.com/checkUser', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...loginForm }), credentials: "include" })
     let success = await res.text()
     if (success == "true") {
       value.setloggedIn(true)

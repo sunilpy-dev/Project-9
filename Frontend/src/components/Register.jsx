@@ -26,13 +26,13 @@ const Register = () => {
         setregisterForm({ ...registerForm, [e.target.name]: e.target.value })
     }
     const handleSubmit = async () => {
-        let found = await fetch('http://localhost:3000/finduser', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...registerForm }) })
+        let found = await fetch('https://snip-vault-backend.onrender.com/finduser', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...registerForm }) })
         // let emlrs = await fetch('http://localhost:3000/findemail', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email }) })
         let datafound = await found.text()
         // console.log(datafound)
         if (datafound == "true") {
             if (registerForm.email.length >= 11 && registerForm.email.endsWith('@gmail.com')) {
-                let res = await fetch('http://localhost:3000/saveRegister', {
+                let res = await fetch('https://snip-vault-backend.onrender.com/saveRegister', {
                     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...registerForm, id: uuidv4(),verificationCode: OTPGenerator()})
                     , credentials: 'include'
                 })
