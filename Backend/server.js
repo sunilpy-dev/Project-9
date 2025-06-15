@@ -19,19 +19,37 @@ function OTPGenerator() {
   return 10000 + Math.floor(Math.random() * 90000);
 }
 
-app.use(cors(
-  {
-    origin:"https://snip-vault-ten.vercel.app/",  // your frontend origin
-    credentials: true
-  }
-))
+const allowedOrigins = [
+  'https://snip-vault-ten.vercel.app'
+];
+
+// app.use(cors(
+//   {
+//     origin:"https://snip-vault-ten.vercel.app/",  // your frontend origin
+//     credentials: true
+//   }
+// ))
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
+
+app.options('*', cors());
 app.use(express.json({ limit: '1mb' }));
 app.use(bodyParser.json())
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const dbName = 'Snip_Vault';
 
-app.options('*', cors());
 app.get('/', async (req, res) => {
   res.send('Hello world');
 })
@@ -243,9 +261,6 @@ app.delete('/', async (req, res) => {
   }
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
 
 function isLoggedIn(req, res, next) {
   // console.log(req.cookies.token);
@@ -280,8 +295,8 @@ const sendEmail = async (username, email, verificationCode) => {
   let htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
 
   htmlTemplate = htmlTemplate
-    .replace('{{username}}', name)
-    .replace('{{OTP_CODE}}', verificationCode);
+  .replace('{{username}}', name)
+  .replace('{{OTP_CODE}}', verificationCode);
   try {
     const info = await transporter.sendMail({
       from: `"Snip-Vault" <${process.env.YOUR_GMAIL}>`,
@@ -290,7 +305,7 @@ const sendEmail = async (username, email, verificationCode) => {
       text: "Hello world?", // plain‑text body
       html: htmlTemplate, // HTML body
     });
-
+    
     // console.log("Message sent:", info.messageId);
   } catch (error) {
     // console.log(error);
@@ -300,9 +315,9 @@ const sendConfirmation = async (username, email) => {
   const name = username;
   const templatePath = path.join(__dirname, 'templates', 'WelcomeEmail.html');
   let htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
-
+  
   htmlTemplate = htmlTemplate
-    .replace('{{username}}', name);
+  .replace('{{username}}', name);
   try {
     const info = await transporter.sendMail({
       from: `"Snip-Vault" <${process.env.YOUR_GMAIL}>`,
@@ -311,9 +326,13 @@ const sendConfirmation = async (username, email) => {
       text: "Hello world?", // plain‑text body
       html: htmlTemplate, // HTML body
     });
-
+    
     // console.log("Message sent:", info.messageId);
   } catch (error) {
     // console.log(error);
   }
 }
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
