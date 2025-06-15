@@ -19,19 +19,20 @@ function OTPGenerator() {
   return 10000 + Math.floor(Math.random() * 90000);
 }
 
-
-// app.use(cors(
-//   {
-//     origin: 'http://localhost:5173',  // your frontend origin
-//     credentials: true
-//   }
-// ))
-app.use(cors(
-  {
-    origin: 'https://snip-vault-frontend.onrender.com',  // your frontend origin
-    credentials: true
-  }
-))
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://snip-vault-frontend.onrender.com'
+];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true
+}));
 
 app.use(express.json({ limit: '1mb' }));
 app.use(bodyParser.json())
