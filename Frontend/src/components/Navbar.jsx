@@ -72,7 +72,7 @@ const Navbar = () => {
 
   useEffect(() => {
     if (hamBurger) {
-      document.body.classList.add('overflow-hidden', 'touch-none'); // Add Tailwind class manually
+      document.body.classList.add('overflow-hidden'); // Add Tailwind class manually
     } else {
       document.body.classList.remove('overflow-hidden'); // Restore scroll
     }
