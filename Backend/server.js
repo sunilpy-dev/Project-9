@@ -14,7 +14,7 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 const port = process.env.PORT || 3000
-const secret=process.env.JWT_SECRET;
+const secret = process.env.JWT_SECRET;
 function OTPGenerator() {
   return 10000 + Math.floor(Math.random() * 90000);
 }
@@ -89,9 +89,9 @@ app.post('/sendConfirm', async (req, res) => {
   try {
     sendConfirmation(username, email);
     res.json({ loggedIn: true, user: req.user });
-    
+
   } catch (error) {
-    res.status(500).json({Message:"Message not sent"});
+    res.status(500).json({ Message: "Message not sent" });
   }
 })
 
@@ -104,9 +104,9 @@ app.post('/fetchdata', async (req, res) => {
     // console.log("using regex:", new RegExp(`${regx}$`))
     const result = await collection.find({ "id": { $regex: new RegExp(`${(regx)}$`) } }).toArray();
     // const result = await collection.find({"id":{$regex:/-mhbhagat9900$/}}).toArray();
-    res.json({Result:result})
+    res.json({ Result: result })
   } catch (error) {
-    res.status(500).json({Message:"Data not found"});
+    res.status(500).json({ Message: "Data not found" });
   }
 })
 
@@ -117,9 +117,9 @@ app.post('/', isLoggedIn, async (req, res) => {
     const db = client.db(dbName);
     const collection = db.collection('Code_details');
     const result = await collection.insertOne(data)
-    res.send({ Success: true, Result: result })
+    res.json({ Success: true, Result: result })
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json({ Success: false, Result: "Server error" });
   }
 
 })
@@ -157,32 +157,28 @@ app.post('/saveRegister', async (req, res) => {
         // console.log({ username: username, email: email, password: hash, id: id })
         await client.connect();
         const db = client.db(dbName);
-        const collection = db.collection('Register_details');
-        const result = await collection.insertOne({ username: username, email: email, password: hash, id: id, verificationCode: verificationCode })
-        sendEmail(username, email, verificationCode)
-        let token = jwt.sign({ email: email }, secret, { expiresIn: '10m' })
-        res.cookie('token', token
-          , {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None', // or 'Lax'
-            maxAge: 10 * 60 * 1000, // 10 minutes
-          }
-        )
-        // console.log(token)
-        // res.send(true)
-        res.send({ Success: true, Result: result })
+        const collection = db.collection('Temp_register');
+        await collection.deleteMany({ email: email })
+        const Message = await sendEmail(username, email, verificationCode)
+        if (Message.message == true) {
+          const result = await collection.insertOne({ username: username, email: email, password: hash, id: id, verificationCode: verificationCode })
+          // console.log(token)
+          // res.send(true)
+          res.json({ Success: true, Result: result })
+        } else {
+          return res.json({ Success: false, Result: Message.message })
+        }
       });
     });
-    
+
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json({ Result: "Server error" });
   }
 })
 app.post('/checkUser', async (req, res) => {
-  const data = await req.body
+  const data = req.body
   try {
-    
+
     // await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('Register_details');
@@ -192,28 +188,28 @@ app.post('/checkUser', async (req, res) => {
       // console.log({pass1:result.password,pass2:data.password})
       bcrypt.compare(data.password, result.password, function (err, isMatch) {
         if (isMatch) {
-          let token = jwt.sign({ email: data.email}, secret, { expiresIn: '10m' })
+          let token = jwt.sign({ email: data.email }, secret, { expiresIn: '10m' })
           res.cookie('token', token
             , {
               httpOnly: true,
               secure: true,
-              sameSite: 'None', // or 'Lax'
+              sameSite: 'Strict', // or 'Lax'
               maxAge: 10 * 60 * 1000, // 10 minutes
             }
           )
-          return res.send(true);
+          return res.json({ Success: true, Result: result });
         }
         if (err) {
-          res.status(500).send("Something went wrong!");
+          res.status(500).json({ Result: "Something went wrong!" });
         }
-        else { return res.send(false); }  //for sending the res to frontend in the through if else use the return here
+        else { return res.json({ Result: false }); }  //for sending the res to frontend in the through if else use the return here
       })
     }
     else {
-      return res.send(false);
+      return res.json({ Result: "Please registerd" });
     }
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send("Server error");
   }
 })
 // app.post('/findemail', async (req, res) => {
@@ -227,15 +223,37 @@ app.post('/checkUser', async (req, res) => {
 
 
 app.post('/verifyOTP', async (req, res) => {
-  const { email, verificationCode } = await req.body
+  const { email, verificationCode } = req.body
   try {
     await client.connect();
     const db = client.db(dbName);
-    const collection = db.collection('Register_details');
+    const collection = db.collection('Temp_register');
+    const newcollection = db.collection('Register_details')
     const result = await collection.findOne({ email: email, verificationCode: verificationCode })
-    res.json({ Success: true, Result: result })
+    // console.log(result)
+    if (!result) {
+      // console.log("enterd here2")
+      return res.json({ Success: false, Result: "Inavlid OTP try again!" })
+    }
+    // console.log("enterd here1")
+    let token = jwt.sign({ email: email }, secret, { expiresIn: '10m' })
+    res.cookie('token', token
+      , {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Strict', // or 'Lax'
+        maxAge: 10 * 60 * 1000, // 10 minutes
+      }
+    )
+    // console.log("till here")
+    const { _id, username, password, id } = result;
+    await newcollection.insertOne({ username: username, email: email, password: password, id: id })
+    await collection.deleteMany({ email: email })
+    return res.json({ Success: true, Result: "Loggedd In" })
+
   } catch (error) {
-    res.status(500).json({message:error});
+    // console.log("entered here3", error)
+    res.status(500).json({ Success: false, Result: error });
   }
 })
 app.post('/resetOTP', async (req, res) => {
@@ -243,37 +261,60 @@ app.post('/resetOTP', async (req, res) => {
   try {
     await client.connect();
     const db = client.db(dbName);
-    const collection = db.collection('Register_details');
-    const result = await collection.updateOne({ email: email },
-      [
-        { $set: { verificationCode: verificationCode } }
-      ])
-    sendEmail(username, email, verificationCode)
-    res.send({ Success: true, Result: result })
+    const collection = db.collection('Temp_register');
+    const Message = await sendEmail(username, email, verificationCode)
+    if (Message.message == true) {
+      const result = await collection.updateOne({ email: email },
+        [
+          { $set: { verificationCode: verificationCode } }
+        ])
+      res.json({ Success: true, Result: "OTP resended" })
+    } else {
+      res.json({ Success: false, Result: Message.message })
+    }
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json({ Result: "Server error!" });
   }
 })
 
 
 
-app.delete('/delete', async (req, res) => {
-  const id = req.body
+app.delete('/', async (req, res) => {
+  const { id } = req.body
   try {
     const db = client.db(dbName);
     const collection = db.collection('Code_details');
-    const result = await collection.deleteOne(id)
-    res.send({ Success: true, Result: result })
+    const result = await collection.deleteOne({ id: id })
+    if (result.deletedCount > 0) {
+      res.json({ Success: true, Result: "Deleted" })
+    } else {
+      res.json({ Success: false, Result: "Not deleted" })
+    }
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json({ Success: false, Resullt: "server error" });
   }
 })
 
+app.delete('/deleteOld', async (req, res) => {
+  const { id } = req.body
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('Code_details');
+    const result = await collection.deleteOne({ id: id })
+    if (result.deletedCount > 0) {
+      res.json({ Success: true, Result: "Deleted" })
+    } else {
+      res.json({ Success: false, Result: "Not deleted" })
+    }
+  } catch (error) {
+    res.status(500).json({ Success: false, Resullt: "server error" });
+  }
+})
 
 function isLoggedIn(req, res, next) {
   // console.log(req.cookies.token);
   if (!req.cookies.token) {
-    return res.status(401).json({ message: "Please login!" });
+    return res.status(401).json({ Result: "Please login!" });
   } else {
     let data = jwt.verify(req.cookies.token, secret);
     req.user = data;
@@ -299,12 +340,17 @@ const transporter = nodemailer.createTransport({
 // Wrap in an async IIFE so we can use await.
 const sendEmail = async (username, email, verificationCode) => {
   const name = username;
+  const capitalized = name
+  .toLowerCase()
+  .split(' ')
+  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  .join(' ');
   const templatePath = path.join(__dirname, 'templates', 'emailVerif.html');
   let htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
 
   htmlTemplate = htmlTemplate
-  .replace('{{username}}', name)
-  .replace('{{OTP_CODE}}', verificationCode);
+    .replace('{{username}}', capitalized)
+    .replace('{{OTP_CODE}}', verificationCode);
   try {
     const info = await transporter.sendMail({
       from: `"Snip-Vault" <${process.env.YOUR_GMAIL}>`,
@@ -313,19 +359,24 @@ const sendEmail = async (username, email, verificationCode) => {
       text: "Hello world?", // plain‑text body
       html: htmlTemplate, // HTML body
     });
-    
+    return { message: true }
     // console.log("Message sent:", info.messageId);
   } catch (error) {
-    // console.log(error);
+    return { message: "Please connect to internet!" }
   }
 }
 const sendConfirmation = async (username, email) => {
   const name = username;
+  const capitalized = name
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
   const templatePath = path.join(__dirname, 'templates', 'WelcomeEmail.html');
   let htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
-  
+
   htmlTemplate = htmlTemplate
-  .replace('{{username}}', name);
+  .replace('{{username}}', capitalized);
   try {
     const info = await transporter.sendMail({
       from: `"Snip-Vault" <${process.env.YOUR_GMAIL}>`,
@@ -334,10 +385,10 @@ const sendConfirmation = async (username, email) => {
       text: "Hello world?", // plain‑text body
       html: htmlTemplate, // HTML body
     });
-    
+    return { message: true }
     // console.log("Message sent:", info.messageId);
   } catch (error) {
-    // console.log(error);
+    return { message: "Please connect to internet!" }
   }
 }
 

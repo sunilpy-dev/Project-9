@@ -169,7 +169,7 @@ const Contact = () => {
             <button
               onClick={handleSubmit}
               disabled={isDisabled}
-              className="w-[70%] sm:w-[80%] md:w-full text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 sm:py-3 rounded-md font-normal sm:font-semibold transition mx-auto"
+              className={`w-[70%] sm:w-[80%] md:w-full text-sm ${isDisabled?"bg-blue-800 cursor-not-allowed":"bg-blue-600 hover:bg-blue-700 cursor-pointer"} text-white py-2 sm:py-3 rounded-md font-normal sm:font-semibold transition mx-auto`}
             >
               Send Message
             </button>

@@ -3,6 +3,8 @@ import './footer.css'
 import { Link, NavLink } from 'react-router-dom';
 
 const Footer = () => {
+    const date = new Date()
+    let year = date.getFullYear()
     const handleClick = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -30,7 +32,7 @@ const Footer = () => {
                         <div className='w-full text-xl md:text-xl lg:text-2xl xl:text-3xl font-bold cursor-pointer flex justify-center items-center'>Snip-Vault</div>
                     </div>
                     <div className="info">
-                        <p className=' text-base md:text-lg xl:text-xl font-semibold font-sans mb-0 xl:m-2 text-center'>This is for the help of developer's -  <span className="imp text-lg md:text-lg xl:text-2xl">Copywrite &copy;2025 SunilPy - Dev's</span></p>
+                        <p className=' text-base md:text-lg xl:text-xl font-semibold font-sans mb-0 xl:m-2 text-center'>This is for the help of developer's -  <span className="imp text-lg md:text-lg xl:text-2xl">Copywrite &copy;{year} SunilPy - Dev's</span></p>
                     </div>
                 </div>
                 <div className="right_box flex justify-center md:items-center xl:items-center md:h-full h-1/4 w-full md:w-full lg:w-1/5 lg:ml-5 py-1 ">

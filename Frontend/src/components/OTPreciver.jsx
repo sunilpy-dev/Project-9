@@ -77,57 +77,98 @@ const OTPreciver = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setisDisabled(true)
+        // console.log("enterd")
         const finalOtp = otp.join("");
+        const id = toast.loading("Please wait...")
         // console.log("Submitted OTP:", finalOtp);
         if (finalOtp == "" || finalOtp.length < 6) {
-            toast.warning('Enter a valid OTP', {
-                position: "top-right",
+            // toast.warning('Enter a valid OTP', {
+            //     position: "top-right",
+            //     autoClose: 2000,
+            //     hideProgressBar: false,
+            //     closeOnClick: true,
+            //     pauseOnHover: false,
+            //     delay: 0,
+            //     draggable: true,
+            //     progress: undefined,
+            //     theme: "dark",
+            // });
+            toast.update(id, {
+                render: 'Enter a valid OTP',
+                type: "warn",
+                isLoading: false,
                 autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                delay: 0,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
             });
+            setisDisabled(false)
         }
         else {
-            let res = await fetch('https://snip-vault-backend.onrender.com/verifyOTP', { method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: value.tempemail, verificationCode: finalOtp }) })
+            // console.log("enterd")
+            let res = await fetch('https://snip-vault-backend.onrender.com/verifyOTP', { method: "POST",credentials:"include", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: value.tempemail, verificationCode: finalOtp }) })
+            // console.log("enterd")
             let respond = await res.json()
-            if (res.ok) {
+            // console.log("enterd")
+            // console.log(respond)
+            if (respond.Success == true) {
                 await fetch('https://snip-vault-backend.onrender.com/sendConfirm', {
-                    method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail })
+                    method: "POST",credentials:"include", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail })
                 })
-
-                navigate('/login', { replace: true })
-            } else if (!res.ok) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                toast.error('Invalid OTP!', {
-                    position: "top-right",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    delay: 0,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
+                toast.update(id, {
+                    render: "Successfuly Registerd",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 900,
                 });
+                setTimeout(() => {
+                    navigate('/login', { replace: true })
+                }, 1000);
+                setOtp(["", "", "", "", "", ""])
+                setisDisabled(false)
+                // value.setregisterd(false)
+            } else if (respond.Success == false) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // toast.error(`${respond.Result}`, id, {
+                //     position: "top-right",
+                //     autoClose: 2000,
+                //     hideProgressBar: false,
+                //     closeOnClick: true,
+                //     pauseOnHover: false,
+                //     delay: 0,
+                //     draggable: true,
+                //     progress: undefined,
+                //     theme: "dark",
+                // });
+                toast.update(id, {
+                    render: `${respond.Result}`,
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+                setisDisabled(false)
+                
+
             }
             else {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                toast.error(`${respond.message}`, {
-                    position: "top-right",
+                // toast.error(`${respond.Result}`, id, {
+                //     position: "top-right",
+                //     autoClose: 2000,
+                //     hideProgressBar: false,
+                //     closeOnClick: true,
+                //     pauseOnHover: false,
+                //     delay: 0,
+                //     draggable: true,
+                //     progress: undefined,
+                //     theme: "dark",
+                // });
+                toast.update(id, {
+                    render: `${respond.Result}`,
+                    type: "error",
+                    isLoading: false,
                     autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    delay: 0,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
                 });
+                setOtp(["", "", "", "", "", ""])
+                setisDisabled(false)
             }
         }
         // Add submission logic here
@@ -135,36 +176,55 @@ const OTPreciver = () => {
 
     const handleResend = async () => {
         setresendClicked(true)
+        setisDisabled(true)
+        const id = toast.loading("Please wait...")
         let res = await fetch('https://snip-vault-backend.onrender.com/resetOTP', {
-            method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail, verificationCode: OTPGenerator() })
+            method: "POST",credentials:"include", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: value.username, email: value.tempemail, verificationCode: OTPGenerator() })
         })
-        if (res.ok) {
+        let getBack = await res.json()
+        if (getBack.Success == true) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            toast.success('OTP Rsended!', {
-                position: "top-right",
+            // toast.success(`${getBack.Result}!`, id, {
+            //     position: "top-right",
+            //     autoClose: 2000,
+            //     hideProgressBar: false,
+            //     closeOnClick: true,
+            //     pauseOnHover: false,
+            //     delay: 0,
+            //     draggable: true,
+            //     progress: undefined,
+            //     theme: "dark",
+            // });
+            toast.update(id, {
+                render: `${getBack.Result}!`,
+                type: "success",
+                isLoading: false,
                 autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                delay: 0,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
             });
             setTimeLeft(2 * 60)
+            setOtp(["", "", "", "", "", ""])
+            setisDisabled(false)
         } else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            toast.error('Something went wrong!', {
-                position: "top-right",
+            // toast.error(`${getBack.Result}!`, id, {
+            //     position: "top-right",
+            //     autoClose: 2000,
+            //     hideProgressBar: false,
+            //     closeOnClick: true,
+            //     pauseOnHover: false,
+            //     delay: 0,
+            //     draggable: true,
+            //     progress: undefined,
+            //     theme: "dark",
+            // });
+            toast.update(id, {
+                render: `${getBack.Result}!`,
+                type: "error",
+                isLoading: false,
                 autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                delay: 0,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
             });
+            setOtp(["", "", "", "", "", ""])
+            setisDisabled(false)
         }
     }
 

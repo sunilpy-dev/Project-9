@@ -15,78 +15,137 @@ const Register = () => {
         return (100000 + Math.floor(Math.random() * 900000)).toString();
     }
     const navigate = useNavigate();
+    const [isDisabled, setisDisabled] = useState(false)
     const value = useContext(loggedInContext);
     const [eyeClose, seteyeClose] = useState(false)
     const handleRedirect = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    const [registerForm, setregisterForm] = useState({ username: "", email: "", password: "",verificationCode:"" })
+    const [registerForm, setregisterForm] = useState({ username: "", email: "", password: "", verificationCode: "" })
 
     function handleChange(e) {
         setregisterForm({ ...registerForm, [e.target.name]: e.target.value })
     }
     const handleSubmit = async () => {
-        let found = await fetch('https://snip-vault-backend.onrender.com/finduser', { method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...registerForm }) })
-        // let emlrs = await fetch('http://localhost:3000/findemail', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email }) })
+        setisDisabled(true)
+        const id = toast.loading("Please wait...")
+        let found = await fetch('https://snip-vault-backend.onrender.com/finduser', { method: "POST",credentials:"include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...registerForm }) })
+        // let emlrs = await fetch('https://snip-vault-backend.onrender.com/findemail', { method: "POST",credentials:"include", headers: { "content-type": "application/json" }, body: JSON.stringify({ email }) })
         let datafound = await found.text()
         // console.log(datafound)
         if (datafound == "true") {
             if (registerForm.email.length >= 11 && registerForm.email.endsWith('@gmail.com')) {
                 let res = await fetch('https://snip-vault-backend.onrender.com/saveRegister', {
-                    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...registerForm, id: uuidv4(),verificationCode: OTPGenerator()})
+                    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...registerForm, id: uuidv4(), verificationCode: OTPGenerator(), isVerified: false })
                     , credentials: 'include'
                 })
-                if (res.ok) {
-                    value.settempemail(registerForm.email)
-                    value.setusername(registerForm.username)
-                    value.setregisterd(true)
-                    setregisterForm({ username: "", email: "", password: "" })  //used to reset the value setted by the user
-                    // setisDisabled(false)
-                    navigate('/otp', { replace: true })
-                } else {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    toast.error('Not registerde yet!', {
-                        position: "top-right",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: false,
-                        delay: 0,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "dark",
+                let get = await res.json()
+                // console.log(get.Success)
+                if (get.Success == true) {
+                    toast.update(id, {
+                        render: "Moving to verify",
+                        type: "success",
+                        isLoading: false,
+                        autoClose: 900,
                     });
+                    // setisDisabled(false)
+                    setTimeout(() => {
+                        value.settempemail(registerForm.email)
+                        value.setusername(registerForm.username)
+                        value.setregisterd(true)
+                        setisDisabled(false)
+                        setregisterForm({ username: "", email: "", password: "" })  //used to reset the value setted by the user
+                        navigate('/otp', { replace: true })
+                    }, 1200);
+                } else if (get.Success == false) {
+                    // console.log("Enterd")
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    // toast.error(`${get.Result}`,id, {
+                    //     position: "top-right",
+                    //     autoClose: 2000,
+                    //     hideProgressBar: false,
+                    //     closeOnClick: true,
+                    //     pauseOnHover: false,
+                    //     delay: 0,
+                    //     draggable: true,
+                    //     progress: undefined,
+                    //     theme: "dark",
+                    // });
+                    toast.update(id, {
+                        render: `${get.Result}`,
+                        type: "error",
+                        isLoading: false,
+                        autoClose: 2000,
+                    });
+                    setregisterForm({ username: "", email: "", password: "" })
+                    setisDisabled(false)
+                    // navigate('/register', { replace: true })
+                }
+                else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    // toast.error('Not registerde please try again!',id, {
+                    //     position: "top-right",
+                    //     autoClose: 2000,
+                    //     hideProgressBar: false,
+                    //     closeOnClick: true,
+                    //     pauseOnHover: false,
+                    //     delay: 0,
+                    //     draggable: true,
+                    //     progress: undefined,
+                    //     theme: "dark",
+                    // });
+                    toast.update(id, {
+                        render: 'Not registerde please try again!',
+                        type: "error",
+                        isLoading: false,
+                        autoClose: 2000,
+                    });
+                    setisDisabled(false)
                 }
             }
             else if (registerForm.email.length == 0 && registerForm.username.length == 0 && registerForm.password.length == 0) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                toast.warn('All fields are required!', {
-                    position: "top-right",
+                // toast.warn('All fields are required!',id, {
+                //     position: "top-right",
+                //     autoClose: 2000,
+                //     hideProgressBar: false,
+                //     closeOnClick: true,
+                //     pauseOnHover: false,
+                //     delay: 0,
+                //     draggable: true,
+                //     progress: undefined,
+                //     theme: "dark",
+                // });
+                toast.update(id, {
+                    render: 'All fields are required!',
+                    type: "warning",
+                    isLoading: false,
                     autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    delay: 0,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
                 });
+                setisDisabled(false)
             }
         }
         else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            toast.error('Email already exits!', {
-                position: "top-right",
+            // toast.error('Email already exits!', id, {
+            //     position: "top-right",
+            //     autoClose: 2000,
+            //     hideProgressBar: false,
+            //     closeOnClick: true,
+            //     pauseOnHover: false,
+            //     delay: 0,
+            //     draggable: true,
+            //     progress: undefined,
+            //     theme: "dark",
+            // });
+            toast.update(id, {
+                render: 'Email already exits!',
+                type: "error",
+                isLoading: false,
                 autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                delay: 0,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
             });
             setregisterForm({ username: "", email: "", password: "" })
+            setisDisabled(false)
         }
     }
     const handleEyeClose = () => {
@@ -144,7 +203,7 @@ const Register = () => {
                             </label>
                             <input value={registerForm.password} name='password' onChange={handleChange} className="bg-gray-50 border border-gray-300 text-black text-xs sm:text-sm md:text-base rounded-lg block w-full p-2 md:p-2.5" placeholder="Enter password" type={`${!eyeClose ? 'password' : 'text'}`} />
                         </div>
-                        <button onClick={handleSubmit} className=" w-3/4 sm:w-2/3 md:w-1/2 xl:w-2/3 bg-blue-500 hover:bg-blue-700  font-medium rounded-lg text-xs sm:text-sm md:text-base lg:text-lg px-2 sm:px-5 py-2 sm:py-2.5 text-center text-white">
+                        <button onClick={handleSubmit} disabled={isDisabled} className={` w-3/4 sm:w-2/3 md:w-1/2 xl:w-2/3 ${isDisabled?" bg-blue-800 cursor-not-allowed":" bg-blue-600 hover:bg-blue-700 cursor-pointer"}   font-medium rounded-lg text-xs sm:text-sm md:text-base lg:text-lg px-2 sm:px-5 py-2 sm:py-2.5 text-center text-white`}>
                             Create an account
                         </button>
                     </div>

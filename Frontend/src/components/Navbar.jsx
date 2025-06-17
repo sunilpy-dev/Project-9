@@ -32,7 +32,7 @@ const Navbar = () => {
   }
   const handleCloseLogOut = async () => {
     sethamBurger(false)
-    let res = await fetch('https://snip-vault-backend.onrender.com/logot',{ method: "GET" ,credentials: "include" });
+    let res = await fetch('https://snip-vault-backend.onrender.com/logot', { method: "GET", credentials: "include" });
     value.setloggedIn(false)
     value.setemail("")
     let success = await res.text()
@@ -48,7 +48,7 @@ const Navbar = () => {
         progress: undefined,
         theme: "dark",
       });
-    } else if(success=="false") {
+    } else if (success == "false") {
       toast.error('Not logged out yet!', {
         position: "top-right",
         autoClose: 2000,
@@ -72,7 +72,7 @@ const Navbar = () => {
 
   useEffect(() => {
     if (hamBurger) {
-      document.body.classList.add('overflow-hidden'); // Add Tailwind class manually
+      document.body.classList.add('overflow-hidden', 'touch-none'); // Add Tailwind class manually
     } else {
       document.body.classList.remove('overflow-hidden'); // Restore scroll
     }
@@ -115,8 +115,8 @@ const Navbar = () => {
             role="button"
             className="group relative inline-flex items-center justify-center text-xs lg:text-base xl:text-lg rounded-xl bg-gray-900 px-5 py-2  md:px-8 md:py-3 font-semibold text-white transition-all duration-200 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 hover:shadow-gray-600/30"
             title="Register"
-            to='/register'
-          >Register<svg
+            to='/login'
+          >Login<svg
             aria-hidden="true"
             viewBox="0 0 10 10"
             height="10"
@@ -184,11 +184,11 @@ const Navbar = () => {
           <div className='flex justify-center items-center flex-col gap-3 w-full'>
             {value.loggedIn && <div className="greet flex flex-col justify-center items-center gap-3 mb-2">
               <div className="userIcon border-2 rounded-full flex justify-center items-center p-1"><FaUserCircle className='text-7xl' /></div>
-              <div className="greetTExt">Welcome User</div>
+              <div className="greetTExt text-sm font-semibold font-serif truncate">Welcome User</div>
             </div>}
             {!value.loggedIn && <div className="greet flex flex-col justify-center items-center gap-3 mb-2">
               <div className="userIcon border-2 rounded-full flex justify-center items-center p-1"><FaUserCircle className='text-7xl' /></div>
-              <div className="greetText text-sm font-semibold font-serif">Welcome's you as a Guest</div>
+              <div className="greetText text-sm font-semibold font-serif truncate">Welcome's you as a Guest</div>
             </div>}
             <div className="line bg-gray-500 w-[60%] h-[.5px] mb-3"></div>
             <div className="text-gray-200 center m-2 text-md font-bold font-serif">Quick Access</div>
@@ -197,7 +197,7 @@ const Navbar = () => {
               <NavLink onClick={handleClose} to='/user_guide' className={`text-sm font-medium text-gray-300 hover:cursor-pointer ${hover2 ? 'animate__animated animate__headShake' : ''}`} >User guide</NavLink>
               <NavLink onClick={handleClose} to='/about' className={`text-sm font-medium text-gray-300 hover:cursor-pointer ${hover1 ? 'animate__animated animate__headShake' : ''}`}>About us</NavLink>
               <NavLink onClick={handleClose} to='/contact' className={`text-sm font-medium text-gray-300 hover:cursor-pointer ${hover3 ? 'animate__animated animate__headShake' : ''}`} >Contact us</NavLink>
-              {!value.loggedIn && <NavLink onClick={handleClose} to='/register' className={`text-sm font-medium text-gray-300 hover:cursor-pointer ${hover3 ? 'animate__animated animate__headShake' : ''}`} >Register</NavLink>}
+              {!value.loggedIn && <NavLink onClick={handleClose} to='/login' className={`text-sm font-medium text-gray-300 hover:cursor-pointer ${hover3 ? 'animate__animated animate__headShake' : ''}`} >Login</NavLink>}
               {value.loggedIn && <button onClick={handleCloseLogOut} className={`text-sm font-medium text-gray-300 hover:cursor-pointer ${hover3 ? 'animate__animated animate__headShake' : ''}`} >Logout</button>}
             </div>
             <div className="Para w-full flex justify-center items-center text-center mt-10"><i className='flex text-center font-sans w-[90%] justify-center items-center text-xs text-gray-400'>"Every link is engineered for quick navigation and zero friction. Minimal effort. Maximum control."</i></div>

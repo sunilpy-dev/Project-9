@@ -40,7 +40,7 @@ function Home() {
     const blurHappend = useRef()
     async function fetchData() {
         // console.log(regx)
-        let req = await fetch('https://snip-vault-backend.onrender.com/fetchdata', { method: "POST",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
+        let req = await fetch('https://snip-vault-backend.onrender.com/fetchdata', { method: "POST",credentials:"include", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
         let data1 = await req.json()
         if (req.ok) {
             setdetails(data1.Result) // so here it is not adding the data1 arrya into details array but setting data1 array to the details array
@@ -94,18 +94,19 @@ function Home() {
 
     async function handleClick() {
         setisDisabled(true)
+        const idGen = uuidv4() + '-' + value.email.split('@')[0];
         // console.log(date.toDateString(), date.toLocaleTimeString())
         if (data.code.length >= 5 && data.language.length >= 1) {
             setclick(true)
             setTimeout(() => {
                 setclick(false)
             }, 2000);
-            let res = await fetch('https://snip-vault-backend.onrender.com/', { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, id: uuidv4() + '-' + value.email.split('@')[0] }) })
+            let res = await fetch('https://snip-vault-backend.onrender.com/', { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, id: idGen }) })
             let recived = await res.json()
-            if (res.ok) {
+            if (recived.Success == true) {
                 setsuccess(true)
                 setTimeout(() => {
-                    setdetails([...details, { ...data, time: date.toLocaleTimeString(), date: `${day}/${month}/${year}`, id: uuidv4() }]) //here we are adding the data object into the details array in the form of object
+                    setdetails([...details, { ...data, time: date.toLocaleTimeString(), date: `${day}/${month}/${year}`, id: idGen }]) //here we are adding the data object into the details array in the form of object
                 }, 2000);
                 setTimeout(() => {
                     setdata({ code: "", description: "", language: "", })  //used to reset the value setted by the user
@@ -126,7 +127,7 @@ function Home() {
             } else {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 setsuccess(false)
-                toast.error(`${recived.message}`, {
+                toast.error(`${recived.Result}`, {
                     position: "top-right",
                     autoClose: 2000,
                     hideProgressBar: false,
@@ -198,10 +199,12 @@ function Home() {
 
     }
     const handleEdit = async (id) => {
-        setdetails(details.filter(item => item.id !== id))
-        let res = await fetch('https://snip-vault-backend.onrender.com/delete', { method: "DELETE",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
-        let result = await res.text()
-        if (res.ok) {
+        let res = await fetch('https://snip-vault-backend.onrender.com/deleteOld', { method: "DELETE", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+        let result = await res.json()
+        // console.log(id)
+        await new Promise(resolve => setTimeout(resolve, 100));
+        if (result.Success == true) {
+            setdetails(details.filter(item => item.id !== id))
             window.scrollTo({ top: 0, behavior: 'smooth' });
             toast.success('Editing on', {
                 position: "top-right",
@@ -214,9 +217,21 @@ function Home() {
                 theme: "dark",
             });
             setdata({ ...details.filter(i => i.id == id)[0], id: id, time: date.toLocaleTimeString(), date: `${day}/${month}/${year}` })
+        } else if (result.Success == false) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            toast.error(`${result.Result}`, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
         } else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            toast.success(`${result}`, {
+            toast.error(`${result.Result}`, {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -232,10 +247,10 @@ function Home() {
     const handleDelet = async (id) => {
         let cnf = confirm("Do you really want to delete this code data?")
         if (cnf) {
-            let del = await fetch('https://snip-vault-backend.onrender.com/delete', { method: "DELETE",credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
-            let result = del.text()
-            if (del.ok) {
-
+            let del = await fetch('https://snip-vault-backend.onrender.com/', { method: "DELETE", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+            let result = await del.json()
+            await new Promise(resolve => setTimeout(resolve, 100));
+            if (result.Success == true) {
                 setdetails(details.filter(item => item.id !== id))
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 toast.success('Code details deleted successfuly', {
@@ -250,7 +265,7 @@ function Home() {
                 });
             } else {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                toast.success(`${result}`, {
+                toast.error(`${result.Result}`, {
                     position: "top-right",
                     autoClose: 2000,
                     hideProgressBar: false,
@@ -264,7 +279,7 @@ function Home() {
         }
         else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            toast.warn('Code details not deleted', {
+            toast.error('Code details not deleted', {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -279,7 +294,7 @@ function Home() {
     }
     const handleExpand = async (id) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        // let res = await fetch('http://localhost:3000/findone', { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
+        // let res = await fetch('https://snip-vault-backend.onrender.com/findone', { method: "POST",credentials:"include", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) })
         // setcodeDetails(dataFound)
         // let dataFound = await res.json()
         // if (dataFound?.Result) {

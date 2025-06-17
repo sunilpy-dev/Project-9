@@ -26,6 +26,7 @@ function App() {
   const [loggedIn, setloggedIn] = useState(false)
   const [registerd, setregisterd] = useState(false)
   const [email, setemail] = useState("")
+  const name = useRef("")
   const [username, setusername] = useState("")
   const [tempemail, settempemail] = useState("")
   const router = createBrowserRouter([
@@ -94,7 +95,7 @@ function App() {
         pauseOnHover
         theme="dark"
       />
-      <loggedInContext.Provider value={{ loggedIn, setloggedIn, email, setemail, tempemail, settempemail, username, setusername, registerd, setregisterd }}>
+      <loggedInContext.Provider value={{ loggedIn, setloggedIn, email, setemail, tempemail, settempemail, username, setusername, registerd, setregisterd,name }}>
         <RouterProvider router={router} />
       </loggedInContext.Provider>
     </>

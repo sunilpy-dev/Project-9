@@ -6,7 +6,7 @@ import { loggedInContext } from '../context/context';
 const ProtectOTP = ({children}) => {
     const value = useContext(loggedInContext);
     if (!value.registerd) {
-        return <Navigate to="/register" replace />;
+        return <Navigate to="/" replace />;
     }
 
     return children;
