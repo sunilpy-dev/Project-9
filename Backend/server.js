@@ -193,7 +193,7 @@ app.post('/checkUser', async (req, res) => {
             , {
               httpOnly: true,
               secure: true,
-              sameSite: 'Strict', // or 'Lax'
+              sameSite: 'None', // or 'Lax'
               maxAge: 10 * 60 * 1000, // 10 minutes
             }
           )
@@ -241,7 +241,7 @@ app.post('/verifyOTP', async (req, res) => {
       , {
         httpOnly: true,
         secure: true,
-        sameSite: 'Strict', // or 'Lax'
+        sameSite: 'None', // or 'Lax'
         maxAge: 10 * 60 * 1000, // 10 minutes
       }
     )
