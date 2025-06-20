@@ -83,26 +83,26 @@ const Navbar = () => {
   }, [hamBurger]);
 
   useEffect(() => {
-          const checkAuth = async () => {
-              const res = await fetch('https://snip-vault-backend.onrender.com/verifyUser', {
-                  method: 'GET',
-                  credentials: 'include'
-              });
-  
-              const data = await res.json();
-  
-              if (res.ok) {
-                  // set login state from server response
-                  value.setemail(data.user.email)
-                  value.setloggedIn(true);
-              } else {
-                  value.setemail("")
-                  value.setloggedIn(false);
-              }
-          };
-  
-          checkAuth();
-      }, []);
+    const checkAuth = async () => {
+      const res = await fetch('https://snip-vault-backend.onrender.com/verifyUser', {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // set login state from server response
+        value.setemail(data.user.email)
+        value.setloggedIn(true);
+      } else {
+        value.setemail("")
+        value.setloggedIn(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   return (
     <>
