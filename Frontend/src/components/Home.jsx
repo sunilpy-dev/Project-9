@@ -84,6 +84,7 @@ function Home() {
                 value.setemail(data.user.email)
                 value.setloggedIn(true);
             } else {
+                value.setemail("")
                 value.setloggedIn(false);
             }
         };
