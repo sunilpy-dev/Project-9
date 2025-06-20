@@ -40,7 +40,7 @@ function Home() {
     const blurHappend = useRef()
     async function fetchData() {
         // console.log(regx)
-        let req = await fetch('https://snip-vault-backend.onrender.com/fetchdata', { method: "POST",credentials:"include", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
+        let req = await fetch('https://snip-vault-backend.onrender.com/fetchdata', { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ regx }) })
         let data1 = await req.json()
         if (req.ok) {
             setdetails(data1.Result) // so here it is not adding the data1 arrya into details array but setting data1 array to the details array

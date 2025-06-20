@@ -82,6 +82,14 @@ const Navbar = () => {
     };
   }, [hamBurger]);
 
+  function firstName(name) {
+    const capitalized = name
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+      return capitalized;
+  }
   useEffect(() => {
     const checkAuth = async () => {
       const res = await fetch('https://snip-vault-backend.onrender.com/verifyUser', {
@@ -91,9 +99,10 @@ const Navbar = () => {
 
       const data = await res.json();
 
-      if (res.ok) {
+      if (data.loggedIn) {
         // set login state from server response
         value.setemail(data.user.email)
+        value.setname(data.user.username)
         value.setloggedIn(true);
       } else {
         value.setemail("")
@@ -206,11 +215,11 @@ const Navbar = () => {
           <div className='flex justify-center items-center flex-col gap-3 w-full'>
             {value.loggedIn && <div className="greet flex flex-col justify-center items-center gap-3 mb-2">
               <div className="userIcon border-2 rounded-full flex justify-center items-center p-1"><FaUserCircle className='text-7xl' /></div>
-              <div className="greetTExt text-sm font-semibold font-serif truncate">Welcome User</div>
+              <div className="greetTExt text-sm font-semibold font-serif truncate">Welcome {firstName(value.name)}</div>
             </div>}
             {!value.loggedIn && <div className="greet flex flex-col justify-center items-center gap-3 mb-2">
               <div className="userIcon border-2 rounded-full flex justify-center items-center p-1"><FaUserCircle className='text-7xl' /></div>
-              <div className="greetText text-sm font-semibold font-serif truncate">Welcome's you as a Guest</div>
+              <div className="greetText text-sm font-semibold font-serif truncate">Welcome Guest</div>
             </div>}
             <div className="line bg-gray-500 w-[60%] h-[.5px] mb-3"></div>
             <div className="text-gray-200 center m-2 text-md font-bold font-serif">Quick Access</div>
