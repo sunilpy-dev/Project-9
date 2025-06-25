@@ -188,7 +188,7 @@ app.post('/checkUser', async (req, res) => {
       // console.log({pass1:result.password,pass2:data.password})
       bcrypt.compare(data.password, result.password, function (err, isMatch) {
         if (isMatch) {
-          let token = jwt.sign({ email: data.email }, secret, { expiresIn: '10m' })
+          let token = jwt.sign({ email: data.email,username: result.username }, secret, { expiresIn: '10m' })
           res.cookie('token', token
             , {
               httpOnly: true,
@@ -236,7 +236,7 @@ app.post('/verifyOTP', async (req, res) => {
       return res.json({ Success: false, Result: "Inavlid OTP try again!" })
     }
     // console.log("enterd here1")
-    let token = jwt.sign({ email: email }, secret, { expiresIn: '10m' })
+    let token = jwt.sign({ email: email,username: result.username }, secret, { expiresIn: '10m' })
     res.cookie('token', token
       , {
         httpOnly: true,
