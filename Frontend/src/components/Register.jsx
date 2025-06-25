@@ -183,6 +183,9 @@ const Register = () => {
                         <p className="text-base sm:text-lg md:text-xl font-bold leading-tight tracking-tight text-gray-100 lg:text-3xl xl:text-4xl w-full text-center">
                             Create an account
                         </p>
+                        <p className="text-xs sm:text-sm md:text-base font-bold leading-tight underline tracking-tight text-yellow-300 lg:text-xl xl:text-xl w-full text-center">
+                            Note: Enter only the registerd email for OTP verification
+                        </p>
                         <div className=' flex flex-col justify-center items-start w-3/4 sm:w-2/3 md:w-1/2 xl:w-2/3 '>
                             <label className="block mb-2 text-sm sm:text-base md:text-lg lg:text-xl font-medium text-gray-100">
                                 Your username
