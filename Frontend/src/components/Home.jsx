@@ -83,6 +83,7 @@ function Home() {
                 // set login state from server response
                 value.setemail(data.user.email)
                 value.setloggedIn(true);
+                value.setname(data.user.username)
             } else {
                 value.setemail("")
                 value.setloggedIn(false);
