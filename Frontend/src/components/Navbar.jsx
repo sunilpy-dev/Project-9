@@ -102,7 +102,7 @@ const Navbar = () => {
       if (data.loggedIn) {
         // set login state from server response
         value.setemail(data.user.email)
-        // value.setname(data.user.username)
+        value.setname(data.user.username)
         value.setloggedIn(true);
       } else {
         value.setemail("")
@@ -215,7 +215,8 @@ const Navbar = () => {
           <div className='flex justify-center items-center flex-col gap-3 w-full'>
             {value.loggedIn && <div className="greet flex flex-col justify-center items-center gap-3 mb-2">
               <div className="userIcon border-2 rounded-full flex justify-center items-center p-1"><FaUserCircle className='text-7xl' /></div>
-              <div className="greetTExt text-sm font-semibold font-serif truncate">Welcome User</div>
+              {/* <div className="greetTExt text-sm font-semibold font-serif truncate">Welcome User</div> */}
+              <div className="greetTExt text-sm font-semibold font-serif truncate">Welcome {firstName(value.name)}</div>
             </div>}
             {!value.loggedIn && <div className="greet flex flex-col justify-center items-center gap-3 mb-2">
               <div className="userIcon border-2 rounded-full flex justify-center items-center p-1"><FaUserCircle className='text-7xl' /></div>
