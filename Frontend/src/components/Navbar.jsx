@@ -83,12 +83,9 @@ const Navbar = () => {
   }, [hamBurger]);
 
   function firstName(name) {
-    const capitalized = name
-      .toLowerCase()
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-      return capitalized;
+    const firstName = name.split(' ')[0];
+    const capitalized = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+    return capitalized;
   }
   useEffect(() => {
     const checkAuth = async () => {
